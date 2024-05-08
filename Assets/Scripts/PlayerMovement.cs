@@ -1,14 +1,22 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private float horizontal; // we use this variable for left and right keyboard inputs
     public float speed = 8f; // speed of player
     public float jumpingPower = 5f; // jump height of player
+    private float horizontal; // we use this variable for left and right keyboard inputs
     private bool isFacingRight = true; // boolean to dicate if player is right or left (start right)
+    [SerializeField] private float coyoteTime = 0.2f; // .2 seconds before falling off platform
+    private float coyoteTimeCounter; // Variable to keep track of the count
     [SerializeField] private Rigidbody2D rb; // allow the script to interact with a rigid body
     [SerializeField] private Transform groundCheck; // allow the script to interact with a ground check
     [SerializeField] private LayerMask groundLayer; // allow the script to interact with a ground layer
+
+    // DEBUG VARIABLES ONLY
+
+    public Text yVelocityText; // Reference to the UI Text element
+    public Text xVelocityText; // Reference to the UI Text element
 
 
 
@@ -16,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
 
     /* Start is called before the first frame update */
     {
+
 
 
 
@@ -28,8 +37,23 @@ public class PlayerMovement : MonoBehaviour
     {
 
         horizontal = Input.GetAxisRaw("Horizontal"); // getting left and right inputs
+        yVelocityText.text = "Velocity Y: " + rb.velocity.y.ToString(); // y velocity debugging
+        xVelocityText.text = "Velocity X: " + rb.position.x.ToString(); // x velocity debugging
 
-        if (Input.GetButtonDown("Jump") && isGrounded()) // make sure jump button pressed and to make sure the player is grounded
+        if (isGrounded())
+        {
+
+            coyoteTimeCounter = coyoteTime; // if grounded, reset the counter
+
+        }
+        else
+        {
+
+            coyoteTimeCounter -= Time.deltaTime; // decrement time from the current count
+
+        }
+
+        if (Input.GetButtonDown("Jump") && coyoteTimeCounter > 0) // make sure jump button pressed and to make sure the player is grounded
         {
 
             rb.velocity = new Vector2(rb.velocity.x, jumpingPower); // set y velocity to jumpingPower
@@ -39,7 +63,9 @@ public class PlayerMovement : MonoBehaviour
         {
 
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f); // reduce y velocity 
+            coyoteTimeCounter = 0f; // to make sure we cant double jump, set the count to 0 when button is let go
         }
+
 
         Flip(); // see line 61
 
