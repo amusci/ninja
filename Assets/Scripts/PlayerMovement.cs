@@ -7,8 +7,24 @@ public class PlayerMovement : MonoBehaviour
     public float jumpingPower = 5f; // jump height of player
     private float horizontal; // we use this variable for left and right keyboard inputs
     private bool isFacingRight = true; // boolean to dicate if player is right or left (start right)
+    /* Coyote Jump Variables 
+    
+        These allow us to jump just after leaving a platform to include player fault
+
+    */
     [SerializeField] private float coyoteTime = 0.2f; // .2 seconds before falling off platform
+
     private float coyoteTimeCounter; // Variable to keep track of the count
+
+
+    /* Jump Buffer Variables 
+
+    These allow us to jump before touching the ground for a more smooth experience
+    
+    */
+    [SerializeField] private float jumpBufferTime = 0.05f; // the time you can jump before actually touching the ground
+    private float jumpBufferCounter; // counter variable
+
     [SerializeField] private Rigidbody2D rb; // allow the script to interact with a rigid body
     [SerializeField] private Transform groundCheck; // allow the script to interact with a ground check
     [SerializeField] private LayerMask groundLayer; // allow the script to interact with a ground layer
@@ -53,10 +69,24 @@ public class PlayerMovement : MonoBehaviour
 
         }
 
-        if (Input.GetButtonDown("Jump") && coyoteTimeCounter > 0) // make sure jump button pressed and to make sure the player is grounded
+        if (Input.GetButtonDown("Jump"))
+        {
+
+            jumpBufferCounter = jumpBufferTime; // jump buffer counter set to the jump buffer time
+        }
+        else
+        {
+
+            jumpBufferCounter -= Time.deltaTime; //  decrement time from the current count
+
+        }
+
+        if (jumpBufferCounter > 0f && coyoteTimeCounter > 0) // make sure jump buffer counter > 0 and coyote time counter > 0
         {
 
             rb.velocity = new Vector2(rb.velocity.x, jumpingPower); // set y velocity to jumpingPower
+
+            jumpBufferCounter = 0f; // reset jump buffer counter
 
         }
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f) // if jump button is let go while mid jump
