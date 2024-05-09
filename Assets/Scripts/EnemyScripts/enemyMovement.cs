@@ -18,6 +18,7 @@ public class EnemyMovement : MonoBehaviour
             if (Vector2.Distance(transform.position, patrolPoints[0].position) < .2f) // if we are .2f close to the point we want to reach
             {
 
+                transform.localScale = new Vector3(3, 3, 3); // making sure the sprite is facing where it was drawn
                 patrolDestination = 1; // next point
 
             }
@@ -31,6 +32,7 @@ public class EnemyMovement : MonoBehaviour
             if (Vector2.Distance(transform.position, patrolPoints[1].position) < .2f) // if we are .2f close
             {
 
+                transform.localScale = new Vector3(-3, 3, 3); // flip the sprite
                 patrolDestination = 0; // set to next point
 
             }
