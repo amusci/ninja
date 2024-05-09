@@ -35,18 +35,6 @@ public class PlayerMovement : MonoBehaviour
     public Text xVelocityText; // Reference to the UI Text element
 
 
-
-    void Start()
-
-    /* Start is called before the first frame update */
-    {
-
-
-
-
-    }
-
-
     void Update()
 
     /* Update is called once per frame */
