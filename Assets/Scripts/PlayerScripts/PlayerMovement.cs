@@ -123,11 +123,11 @@ public class PlayerMovement : MonoBehaviour
 
             isFacingRight = !isFacingRight; // reverse the facing directions
 
-            Vector3 localScale = transform.localScale; // get the scale of the object 
+            Vector3 rotation = transform.localRotation.eulerAngles; // get the rotation of the object 
 
-            localScale.x *= -1f; // flip the scale
+            rotation.y += 180f; // add 180 to the y which would flip
 
-            transform.localScale = localScale; // apply the flip back to the object
+            transform.localRotation = Quaternion.Euler(rotation); // apply 
 
         }
 
