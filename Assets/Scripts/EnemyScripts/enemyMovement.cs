@@ -13,7 +13,11 @@ public class EnemyMovement : MonoBehaviour
 
     private bool followingPlayer; // false when not following, true when following
 
-    public Text followingPlayerText; // Reference to the UI Text element
+    /* testing ground check */
+    [SerializeField] private Transform groundCheck; // allow the script to interact with a ground check
+    [SerializeField] private LayerMask groundLayer; // allow the script to interact with a ground layer
+
+
 
     void Start()
     {
@@ -44,13 +48,44 @@ public class EnemyMovement : MonoBehaviour
     }
 
 
+
     void FollowPlayer()
-    /* Moves enemy to the player */
+    {
+        bool grounded = isGrounded(); // check if the player is grounded
+
+        if (!grounded) // if the enemy is not grounded
+        {
+
+            disableCollisions(); // this is the worst workaround i have ever created and i will not be fixing this for awhile.
+            Debug.LogWarning("not grounded");
+
+
+        }
+        else // if the enemy is grounded
+        {
+
+            reEnableCollisions(); // im sorry God
+
+            Vector2 targetPosition = new Vector2(player.position.x, transform.position.y); // move towards the player only in the x-axis
+            transform.position = Vector2.MoveTowards(transform.position, targetPosition, (moveSpeed + 2) * Time.deltaTime); // move towards the player
+        }
+    }
+
+
+    private bool isGrounded()
+
+    /* determine if the player's groundcheck overlaps with anything with a ground layer */
     {
 
-        transform.position = Vector2.MoveTowards(transform.position, player.position, (moveSpeed + 2) * Time.deltaTime); // move towards player 
+
+        // Use Physics2D.OverlapCircle to check if there's any collider overlapping with the groundCheck position
+        // The 0.2f radius defines how far the ground check extends
+        // The groundLayer is the layer mask used to filter what objects should be considered as ground
+
+        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
 
     }
+
     void checkForPlayer()
     /* Check to see if player is in the detection range of enemy */
     {
@@ -100,4 +135,35 @@ public class EnemyMovement : MonoBehaviour
         }
 
     }
+
+    void disableCollisions()
+    {
+
+        // disable collisions with other colliders
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 100f); // get an array of colliders within 100f
+        foreach (Collider2D collider in colliders) // iterate through each collider
+        {
+            if (collider != GetComponent<Collider2D>()) // check if collider is not enemy's
+            {
+                Physics2D.IgnoreCollision(GetComponent<Collider2D>(), collider, true);  // disable collider between enemy and collider
+            }
+        }
+
+    }
+
+    void reEnableCollisions()
+    {
+
+        // Re-enable collisions with all other colliders
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 100f); // get an array of colliders within 100f
+        foreach (Collider2D collider in colliders) // iterate through each collider
+        {
+            if (collider != GetComponent<Collider2D>()) // check if collider is not enemy's
+            {
+                Physics2D.IgnoreCollision(GetComponent<Collider2D>(), collider, false); // disable collider between enemy and collider
+            }
+        }
+
+    }
+
 }
